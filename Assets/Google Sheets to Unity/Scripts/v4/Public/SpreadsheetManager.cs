@@ -4,6 +4,7 @@ using GoogleSheetsToUnity;
 using GoogleSheetsToUnity.ThirdPary;
 using TinyJSON;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public delegate void OnSpreedSheetLoaded(GstuSpreadSheet sheet);
 namespace GoogleSheetsToUnity
@@ -53,12 +54,12 @@ namespace GoogleSheetsToUnity
             
             if (Application.isPlaying)
             {
-                new Task(Read(new WWW(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
+                new Task(Read(sb.ToString(), searchDetails.titleColumn, searchDetails.titleRow, callback));
             }
 #if UNITY_EDITOR
             else
             {
-                EditorCoroutineRunner.StartCoroutine(Read(new WWW(sb.ToString()), searchDetails.titleColumn, searchDetails.titleRow, callback));
+                EditorCoroutineRunner.StartCoroutine(Read(sb.ToString(), searchDetails.titleColumn, searchDetails.titleRow, callback));
             }
 #endif
         }
@@ -71,11 +72,14 @@ namespace GoogleSheetsToUnity
         /// <param name="titleRow"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
-        static IEnumerator Read(WWW www, string titleColumn, int titleRow, OnSpreedSheetLoaded callback)
-        {
-            yield return www;
 
-            ValueRange rawData = JSON.Load(www.text).Make<ValueRange>();
+        static IEnumerator Read(string apiUrl, string titleColumn, int titleRow, OnSpreedSheetLoaded callback)
+        {
+            UnityWebRequest publicSheetRequest = UnityWebRequest.Get(apiUrl);
+
+            yield return publicSheetRequest.SendWebRequest();
+
+            ValueRange rawData = JSON.Load(publicSheetRequest.downloadHandler.text).Make<ValueRange>();
             GSTU_SpreadsheetResponce responce = new GSTU_SpreadsheetResponce(rawData);
 
             GstuSpreadSheet spreadSheet = new GstuSpreadSheet(responce, titleColumn, titleRow);
