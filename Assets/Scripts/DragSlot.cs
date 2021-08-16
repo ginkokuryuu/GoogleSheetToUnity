@@ -15,7 +15,7 @@ public class DragSlot : MonoBehaviour, IDropHandler
         if (eventData.pointerDrag == null)
             return;
 
-        eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+        eventData.pointerDrag.GetComponent<RectTransform>().position = GetComponent<RectTransform>().position;
         eventData.pointerDrag.GetComponent<DragAndDrop>().AttachToSlot(this);
         attachedObject = eventData.pointerDrag;
     }

@@ -9,18 +9,45 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     Canvas canvas;
     CanvasGroup canvasGroup;
     Vector2 initialPosition = new Vector2();
+    bool initPosAlreadySet = false;
     DragSlot dragSlot;
+    Transform formerParent;
+
+    public int maximumNumerOfTryingToFindCanvas = 5;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-        initialPosition = rectTransform.anchoredPosition;
+        initialPosition = rectTransform.position;
+    }
 
+    public void SetInitPosition()
+    {
+        initPosAlreadySet = true;
+        initialPosition = rectTransform.position;
+    }
+
+    void GetFormerParent()
+    {
+        formerParent = transform.parent;
+    }
+
+    void TryToSearchCanvas()
+    {
+        int count = 0;
+        Transform parent = transform;
         while (canvas == null)
         {
-            Transform parent = transform.parent;
-            canvas = parent.GetComponent<Canvas>();
+            parent = parent.parent;
+            if(parent.GetComponent<Canvas>() != null)
+                canvas = parent.GetComponent<Canvas>();
+            count += 1;
+            if (count == maximumNumerOfTryingToFindCanvas)
+            {
+                Debug.LogError("No Canvas Found");
+                break;
+            }
         }
     }
 
@@ -49,7 +76,20 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (canvas == null)
+        {
+            TryToSearchCanvas();
+        }
 
+        if (!initPosAlreadySet)
+        {
+            SetInitPosition();
+        }
+
+        if(formerParent == null)
+        {
+            GetFormerParent();
+        }
     }
 
     public void AttachToSlot(DragSlot slot)
@@ -59,6 +99,6 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
 
     public void ResetPosition()
     {
-        rectTransform.anchoredPosition = initialPosition;
+        rectTransform.position = initialPosition;
     }
 }

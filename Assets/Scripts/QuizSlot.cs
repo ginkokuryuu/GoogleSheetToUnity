@@ -5,12 +5,12 @@ using UnityEngine.EventSystems;
 
 public class QuizSlot : DragSlot
 {
-    [SerializeField] string slotName = "";
+    [SerializeField] string slotName = "placeholder";
     bool isCorrect = false;
 
     public bool IsCorrect { get => isCorrect; set => isCorrect = value; }
 
-    private void Start()
+    private void OnEnable()
     {
         QuizHandler.INSTANCE.AllQuizSlots.Add(this);
     }
@@ -18,6 +18,11 @@ public class QuizSlot : DragSlot
     private void OnDisable()
     {
         QuizHandler.INSTANCE.AllQuizSlots.Remove(this);
+    }
+
+    public void SetName(string _slotName)
+    {
+        slotName = _slotName;
     }
 
     public override void OnDrop(PointerEventData eventData)
