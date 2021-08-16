@@ -5,10 +5,13 @@ using UnityEngine.EventSystems;
 
 public class DragSlot : MonoBehaviour, IDropHandler
 {
-    GameObject attachedObject;
+    protected GameObject attachedObject;
 
     public virtual void OnDrop(PointerEventData eventData)
     {
+        if (attachedObject != null)
+            return;
+
         if (eventData.pointerDrag == null)
             return;
 

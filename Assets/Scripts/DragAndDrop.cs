@@ -15,8 +15,9 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
-        
-        while(canvas == null)
+        initialPosition = rectTransform.anchoredPosition;
+
+        while (canvas == null)
         {
             Transform parent = transform.parent;
             canvas = parent.GetComponent<Canvas>();
@@ -29,6 +30,7 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
         canvasGroup.alpha = 0.8f;
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         dragSlot?.DetachObject();
+        dragSlot = null;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -40,11 +42,14 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+
+        if (dragSlot == null)
+            ResetPosition();
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        initialPosition = rectTransform.anchoredPosition;
+
     }
 
     public void AttachToSlot(DragSlot slot)

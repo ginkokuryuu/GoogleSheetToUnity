@@ -8,8 +8,23 @@ public class QuizSlot : DragSlot
     [SerializeField] string slotName = "";
     bool isCorrect = false;
 
+    public bool IsCorrect { get => isCorrect; set => isCorrect = value; }
+
+    private void Start()
+    {
+        QuizHandler.INSTANCE.AllQuizSlots.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        QuizHandler.INSTANCE.AllQuizSlots.Remove(this);
+    }
+
     public override void OnDrop(PointerEventData eventData)
     {
+        if (attachedObject != null)
+            return;
+
         if (eventData.pointerDrag == null)
             return;
 
